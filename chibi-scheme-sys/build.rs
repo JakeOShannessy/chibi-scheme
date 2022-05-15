@@ -1,61 +1,5 @@
-extern crate bindgen;
-
 use std::collections::HashSet;
 use std::env;
-use std::io;
-use std::path::Path;
-use std::process::Command;
-
-fn checkout(dir: &Path, tag: &str) -> io::Result<()> {
-    Command::new("git")
-        .current_dir(dir)
-        .arg("clone")
-        .args(&["--depth", "100"])
-        .arg("--single-branch")
-        .arg("https://github.com/ashinn/chibi-scheme")
-        .status()?;
-
-    let status = Command::new("git")
-        .current_dir(dir.join("chibi-scheme"))
-        .arg("pull")
-        .status()?;
-
-    if status.success() {
-        Ok(())
-    } else {
-        Err(io::Error::new(io::ErrorKind::Other, "Failed to checkout"))
-    }
-}
-
-fn make(dir: &Path) -> io::Result<()> {
-    Command::new("make")
-        .current_dir(dir.clone().join("chibi-scheme"))
-        .arg("clean")
-        .status()?;
-
-    Command::new("make")
-        .current_dir(dir.clone().join("chibi-scheme"))
-        .arg(format!("PREFIX={}/install", dir.clone().to_str().unwrap()))
-        .arg("uninstall")
-        .status()?;
-
-    Command::new("make")
-        .current_dir(dir.clone().join("chibi-scheme"))
-        .arg(format!("PREFIX={}/install", dir.clone().to_str().unwrap()))
-        .status()?;
-
-    let status = Command::new("make")
-        .current_dir(dir.clone().join("chibi-scheme"))
-        .arg(format!("PREFIX={}/install", dir.clone().to_str().unwrap()))
-        .arg("install")
-        .status()?;
-
-    if status.success() {
-        Ok(())
-    } else {
-        Err(io::Error::new(io::ErrorKind::Other, "Failed to run make"))
-    }
-}
 
 // Taken from https://github.com/rust-lang/rust-bindgen/issues/687
 #[derive(Debug)]
@@ -73,8 +17,9 @@ impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
 
 fn main() {
     let out_dir = env::var("OUT_DIR").unwrap();
-    checkout(Path::new(&out_dir), "0.8").unwrap();
-    make(Path::new(&out_dir)).unwrap();
+    let dst = cmake::Config::new("chibi-scheme")
+        .define("BUILD_SHARED_LIBS", "OFF")
+        .build();
     let ignored_macros = IgnoreMacros(
         vec![
             "FP_INFINITE".into(),
@@ -88,19 +33,28 @@ fn main() {
             "FP_INT_TOWARDZERO".into(),
             "FP_INT_TONEARESTFROMZERO".into(),
             "FP_INT_TONEAREST".into(),
-        ].into_iter()
+        ]
+        .into_iter()
         .collect(),
     );
     let bindings = bindgen::Builder::default()
-        .header(format!("{}/chibi-scheme/include/chibi/eval.h", &out_dir))
-        .clang_arg(format!("-I/{}/chibi-scheme/include", &out_dir))
+        .clang_arg(format!("-I{}", dst.join("include").display()))
+        .header(format!("{}/include/chibi/eval.h", dst.display()))
         .parse_callbacks(Box::new(ignored_macros))
+        .blocklist_type("_?P?IMAGE_TLS_DIRECTORY.*")
         .generate()
         .expect("Unable to generate bindings");
     bindings
         .write_to_file(format!("{}/bindings.rs", out_dir))
         .expect("Could not write bindings");
 
-    println!("cargo:rustc-link-search=native={}/chibi-scheme/", &out_dir);
-    println!("cargo:rustc-link-lib=chibi-scheme");
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dst.join("lib").display()
+    );
+    #[cfg(windows)]
+    let libname = "libchibi-scheme";
+    #[cfg(not(windows))]
+    let libname = "chibi-scheme";
+    println!("cargo:rustc-link-lib=static={}", libname);
 }

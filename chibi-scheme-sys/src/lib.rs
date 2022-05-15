@@ -107,8 +107,12 @@ pub fn sexp_pointer_tag(x: sexp) -> sexp_tag_t {
     unsafe { (*x).tag }
 }
 
-pub fn sexp_check_tag(x: sexp, t: sexp_tag_t) -> bool {
-    sexp_pointerp(x) && (sexp_pointer_tag(x) == t)
+pub fn sexp_check_tag(x: sexp, t: sexp_types) -> bool {
+    let tag = sexp_pointer_tag(x);
+    // Cast to i32 on Windows
+    #[cfg(windows)]
+    let tag = tag as i32;
+    sexp_pointerp(x) && (tag == t)
 }
 
 pub fn sexp_stringp(x: sexp) -> bool {

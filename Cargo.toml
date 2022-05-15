@@ -1,13 +1,6 @@
-[package]
-name = "chibi-scheme"
-version = "0.1.0"
-authors = ["Yilin <yilin.wei10@gmail.com>"]
-edition = "2018"
-repository = "https://github.com/yilinwei/chibi-scheme"
-description = "Rust bindings to chibi-scheme"
-license = "Apache-2.0"
-
-[dependencies]
-chibi-scheme-sys = { path = "chibi-scheme-sys" }
-chibi-scheme-derive= { path = "chibi-scheme-derive"}
-serde = { version = "1.0.90", features = ["derive"] }
+[workspace]
+members = [
+    "chibi-scheme",
+    "chibi-scheme-sys",
+    "chibi-scheme-derive",
+]

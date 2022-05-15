@@ -1,9 +1,11 @@
 [package]
-name = "chibi-scheme-sys"
-version = "0.1.0"
 authors = ["Yilin <yilin.wei10@gmail.com>"]
 edition = "2018"
+name = "chibi-scheme-sys"
+version = "0.1.0"
+
 [build-dependencies]
-bindgen = "0.48.1"
+bindgen = "0.59"
+cmake = "0.1"
 
 [dependencies]
