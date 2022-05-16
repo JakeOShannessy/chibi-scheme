@@ -2,9 +2,7 @@
 #![allow(unused_variables)]
 #![allow(unused_mut)]
 use crate::serde::error::{Error, Result};
-use crate::sexp::{
-    SExp, String,
-};
+use crate::sexp::{SExp, String};
 use serde::de::{self, DeserializeSeed, MapAccess, Visitor};
 use serde::Deserialize;
 

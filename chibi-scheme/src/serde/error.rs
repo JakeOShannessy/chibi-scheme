@@ -53,7 +53,7 @@ impl std::error::Error for Error {
             Error::ExpectedPair(ref msg) => msg,
             Error::DeserializeAnyNotSupported => &"Deserialize any not supported",
             Error::DeserializeIgnoredAnyNotSupported => &"Deserialize ignore any not supported",
-            Error::IntegerTooLargeForBytes(_) => &"Integer too large for bytes"
+            Error::IntegerTooLargeForBytes(_) => &"Integer too large for bytes",
         }
     }
 

@@ -34,7 +34,7 @@ pub enum SExp<'a> {
     Pair(Pair<'a>),
     Exception(Exception<'a>),
     Void(Void),
-    Env(Env<'a>)
+    Env(Env<'a>),
 }
 
 impl<'a> ops::Deref for SExp<'a> {
@@ -51,7 +51,7 @@ impl<'a> ops::Deref for SExp<'a> {
             SExp::Pair(p) => p,
             SExp::Exception(e) => e,
             SExp::Void(v) => v,
-            SExp::Env(e) => e
+            SExp::Env(e) => e,
         }
     }
 }
@@ -69,7 +69,7 @@ impl<'a> fmt::Debug for SExp<'a> {
             SExp::Rational(r) => r.fmt(fmt),
             SExp::Symbol(s) => s.fmt(fmt),
             SExp::Void(v) => v.fmt(fmt),
-            SExp::Env(e) => e.fmt(fmt)
+            SExp::Env(e) => e.fmt(fmt),
         }
     }
 }
@@ -418,7 +418,9 @@ impl Context {
         // let stderr = 2;
         // sexp_load_standard_ports(ctx, NULL, stdin, stdout, stderr, 0);
         let sexp = RawSExp {
-            sexp: unsafe { sexp_load_standard_ports(self.0, ptr::null_mut(),  stdin, stdout, stderr, 0) },
+            sexp: unsafe {
+                sexp_load_standard_ports(self.0, ptr::null_mut(), stdin, stdout, stderr, 0)
+            },
             context: Some(self),
         };
         if sexp_exceptionp(sexp.sexp) {
@@ -579,5 +581,4 @@ mod tests {
             context.eval_string("(first '(1 2))")
         );
     }
-
 }
