@@ -1,6 +1,8 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+// Needed because of bindgen tests, ref https://github.com/rust-lang/rust-bindgen/issues/1651
+#![allow(deref_nullptr)]
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
@@ -64,7 +66,7 @@ pub fn sexp_flonump(x: sexp) -> bool {
 }
 
 pub fn sexp_exceptionp(x: sexp) -> bool {
-    sexp_check_tag(x, sexp_types_SEXP_EXCEPTION)
+        sexp_check_tag(x, sexp_types_SEXP_EXCEPTION)
 }
 
 pub fn sexp_exception_message(x: sexp) -> sexp {

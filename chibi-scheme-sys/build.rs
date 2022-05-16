@@ -41,6 +41,13 @@ fn main() {
         .clang_arg(format!("-I{}", dst.join("include").display()))
         .header(format!("{}/include/chibi/eval.h", dst.display()))
         .parse_callbacks(Box::new(ignored_macros))
+        .allowlist_function("sexp.*")
+        .allowlist_type("sexp.*")
+        .allowlist_var("sexp.*")
+        .allowlist_var("stdin")
+        .allowlist_var("stdout")
+        .allowlist_var("stderr")
+        .allowlist_var("SEXP.*")
         .blocklist_type("_?P?IMAGE_TLS_DIRECTORY.*")
         .generate()
         .expect("Unable to generate bindings");

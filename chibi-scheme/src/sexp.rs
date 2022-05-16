@@ -412,6 +412,21 @@ impl Context {
             Ok(Env(sexp))
         }
     }
+    pub fn standard_ports(&mut self) -> Result<Env, Exception> {
+        // let stdin = 0;
+        // let stdout = 1;
+        // let stderr = 2;
+        // sexp_load_standard_ports(ctx, NULL, stdin, stdout, stderr, 0);
+        let sexp = RawSExp {
+            sexp: unsafe { sexp_load_standard_ports(self.0, ptr::null_mut(),  stdin, stdout, stderr, 0) },
+            context: Some(self),
+        };
+        if sexp_exceptionp(sexp.sexp) {
+            Err(Exception(sexp).into())
+        } else {
+            Ok(Env(sexp))
+        }
+    }
     pub fn cons<'a>(&self, a: &'a SExp, b: &'a SExp) -> SExp {
         let sexp = RawSExp {
             sexp: sexp_cons(self.0, a.sexp, b.sexp),
@@ -453,6 +468,7 @@ impl Context {
     }
 }
 
+#[cfg(test)]
 mod tests {
 
     use crate::sexp::*;

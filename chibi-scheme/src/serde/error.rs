@@ -35,7 +35,7 @@ impl de::Error for Error {
 
 impl Display for Error {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        formatter.write_str(std::error::Error::description(self))
+        write!(formatter, "{}", self)
     }
 }
 
@@ -57,7 +57,7 @@ impl std::error::Error for Error {
         }
     }
 
-    fn cause(&self) -> Option<&std::error::Error> {
+    fn cause(&self) -> Option<&dyn std::error::Error> {
         match self {
             Error::IntegerTooLargeForBytes(cause) => Some(cause),
             _ => None,

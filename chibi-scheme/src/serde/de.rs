@@ -1,12 +1,12 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
 use crate::serde::error::{Error, Result};
 use crate::sexp::{
-    Bool, Char, Context, Exception, Integer, Null, Pair, Rational, SExp, String, Symbol,
+    SExp, String,
 };
 use serde::de::{self, DeserializeSeed, MapAccess, Visitor};
 use serde::Deserialize;
-use std::cell;
-use std::convert::TryFrom;
-use std::num::TryFromIntError;
 
 pub struct Deserializer<'c> {
     input: SExp<'c>,
@@ -355,11 +355,12 @@ where
     T::deserialize(&mut deserializer)
 }
 
+#[cfg(test)]
 mod tests {
 
     use crate::serde::de;
     use crate::sexp;
-    use crate::sexp::{Context, Integer, Rational, SExp};
+    use crate::sexp::{Context, Integer, SExp};
     use chibi_scheme_sys;
     use serde::Deserialize;
     use std::cmp::PartialEq;
@@ -437,7 +438,6 @@ mod tests {
 
     #[test]
     fn test_deserialize_struct() {
-        let context = Context::default();
         #[derive(Deserialize, PartialEq, Debug)]
         struct Foo {
             bar: bool,
@@ -459,7 +459,6 @@ mod tests {
 
     #[test]
     fn test_deserialize_nested_struct() {
-        let context = Context::default();
         #[derive(Deserialize, PartialEq, Debug)]
         struct Foo {
             bar: bool,
